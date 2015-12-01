@@ -1,6 +1,3 @@
-#ifndef WIN_HEADERS_H
-#define WIN_HEADERS_H
-
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -16,5 +13,3 @@
 #endif
 
 #include "misc.h"
-
-#endif	// WIN_HEADERS_H

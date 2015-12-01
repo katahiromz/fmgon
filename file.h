@@ -1,7 +1,7 @@
 //  $Id: file.h,v 1.6 1999/11/26 10:14:09 cisc Exp $
 
-#ifndef FMGENGEN_FILE_H
-#define FMGENGEN_FILE_H
+#ifndef FMGON_FILE_H
+#define FMGON_FILE_H
 
 // ---------------------------------------------------------------------------
 
@@ -49,4 +49,4 @@ private:
     const FileIO& operator=(const FileIO&);
 }; // class FileIO
 
-#endif  // ndef FMGENGEN_FILE_H
+#endif  // ndef FMGON_FILE_H
