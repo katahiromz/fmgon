@@ -1,0 +1,47 @@
+2015年12月1日
+
+ファイル「readme.txt」を「OldReadMe.txt」に改名。
+型uintをuint32_tに変換。
+型uint8をuint8_tに変換。
+型uint16をuint16_tに変換。
+型uint32をuint32_tに変換。
+型int8をint8_tに変換。
+型int16をint16_tに変換。
+ファイル「types.h」を削除。
+ファイル「headers.h」をファイル「stdafx.h」に改名。
+「#include "headers.h"」を「#include "stdafx.h"」に書き換え。
+二重インクルード防止マクロの名前を改良する。
+タブをスペースに変換。
+ファイル「stdafx.h」の次のコード：
+    #ifdef _MSC_VER
+        #undef max
+        #define max _MAX
+        #undef min
+        #define min _MIN
+    #endif
+を
+    #undef max
+    #undef min
+にする。
+ファイル「stdafx.h」において、
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+    #include <string.h>
+    #include <assert.h>
+を
+    #include <cstdio>
+    #include <cstdlib>
+    #include <cmath>
+    #include <cstring>
+    #include <cassert>
+に変更。
+ファイル「file.h」とOPNA::LoadRhythmSampleのFileIOクラスの使用を単純化。
+ファイル「file.cpp」を削除。
+マクロ「MAX_PATH」が未定義のときに、ファイル「stdafx.h」で定義。
+ファイル「diag.h」を削除。
+ファイル「stdafx.h」の中の「#include <windows.h>」などを削除。
+マクロ「FM_SAMPLETYPE」を「int16_t」にする。
+マクロ「PSG_SAMPLETYPE」を「int16_t」にする。
+コード「#include "misc.h"」をファイル「stdafx.h」の中へ移動。
+コードの整形。
