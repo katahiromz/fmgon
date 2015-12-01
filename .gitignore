@@ -1,0 +1,15 @@
+*.o
+*.obj
+*.res
+*.tds
+*.map
+x64/
+ipch/
+Debug/
+Release/
+.vs/
+*.sdf
+*.suo
+*.opensdf
+*.user
+*.filters
