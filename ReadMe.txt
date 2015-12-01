@@ -6,6 +6,7 @@
 このフォルダーは、ciscさん (cisc@retropc.net) の「FM Sound Generator」を
 片山博文MZ (katayama.hirofumi.mz@gmail.com) が改造したものです。
 詳しくは、ファイル「OldReadMe.txt」をご覧下さい。
+主な変更点についてはファイル「ChangeLog.txt」をご覧下さい。
 
 使用する場合は、ファイル「OldReadMe.txt」の
 【著作権、免責規定】に従って下さい。

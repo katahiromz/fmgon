@@ -1,4 +1,4 @@
-2015年12月1日
+2015年12月1日 片山博文MZ
 
 ファイル「readme.txt」を「OldReadMe.txt」に改名。
 型uintをuint32_tに変換。
