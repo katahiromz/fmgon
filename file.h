@@ -1,64 +1,52 @@
-//	$Id: file.h,v 1.6 1999/11/26 10:14:09 cisc Exp $
+//  $Id: file.h,v 1.6 1999/11/26 10:14:09 cisc Exp $
 
-#if !defined(win32_file_h)
-#define win32_file_h
-
-#include "types.h"
+#ifndef FMGENGEN_FILE_H
+#define FMGENGEN_FILE_H
 
 // ---------------------------------------------------------------------------
 
-class FileIO
-{
+class FileIO {
 public:
-	enum Flags
-	{
-		open		= 0x000001,
-		readonly	= 0x000002,
-		create		= 0x000004,
-	};
+    FileIO() : m_fp(NULL) { }
 
-	enum SeekMethod
-	{
-		begin = 0, current = 1, end = 2,
-	};
+    FileIO(const char* filename, const char *mode) {
+        Open(filename, mode);
+    }
 
-	enum Error
-	{
-		success = 0,
-		file_not_found,
-		sharing_violation,
-		unknown = -1
-	};
+    virtual ~FileIO() {
+        Close();
+    }
 
-public:
-	FileIO();
-	FileIO(const char* filename, uint32_t flg = 0);
-	virtual ~FileIO();
+    bool Open(const char *filename, const char *mode) {
+        m_fp = fopen(filename, mode);
+        return (m_fp != NULL);
+    }
 
-	bool Open(const char* filename, uint32_t flg = 0);
-	bool CreateNew(const char* filename);
-	bool Reopen(uint32_t flg = 0);
-	void Close();
-	Error GetError() { return error; }
+    void Close() {
+        if (m_fp != NULL) {
+            fclose(m_fp);
+            m_fp = NULL;
+        }
+    }
 
-	int32_t Read(void* dest, int32_t len);
-	int32_t Write(const void* src, int32_t len);
-	bool Seek(int32_t fpos, SeekMethod method);
-	int32_t Tellp();
-	bool SetEndOfFile();
+    bool Read(void *dest, size_t len) {
+        return (fread(dest, len, 1, m_fp) == 1);
+    }
 
-	uint32_t GetFlags() { return flags; }
-	void SetLogicalOrigin(int32_t origin) { lorigin = origin; }
+    bool Seek(long offset, int ptrname) {
+        return (fseek(m_fp, offset, ptrname) == 0);
+    }
+
+    bool HasError() const {
+        return (ferror(m_fp) == 0);
+    }
+
+protected:
+    FILE *m_fp;
 
 private:
-	HANDLE hfile;
-	uint32_t flags;
-	uint32_t lorigin;
-	Error error;
-	char path[MAX_PATH];
-	
-	FileIO(const FileIO&);
-	const FileIO& operator=(const FileIO&);
-};
+    FileIO(const FileIO&);
+    const FileIO& operator=(const FileIO&);
+}; // class FileIO
 
-#endif // 
+#endif  // ndef FMGENGEN_FILE_H

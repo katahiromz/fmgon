@@ -1,18 +1,19 @@
 #ifndef WIN_HEADERS_H
 #define WIN_HEADERS_H
 
-#define STRICT
-#define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
+#include <cstring>
+#include <cassert>
+#include <cstdint>
 
 #undef max
 #undef min
+
+#ifndef MAX_PATH
+    #define MAX_PATH 260
+#endif
 
 #include "misc.h"
 

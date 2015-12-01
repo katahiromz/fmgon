@@ -1277,14 +1277,14 @@ bool OPNA::LoadRhythmSample(const char* path)
 		strncat(buf, rhythmname[i], MAX_PATH);
 		strncat(buf, ".WAV", MAX_PATH);
 
-		if (!file.Open(buf, FileIO::readonly))
+		if (!file.Open(buf, "rb"))
 		{
 			if (i != 5)
 				break;
 			if (path)
 				strncpy(buf, path, MAX_PATH);
 			strncpy(buf, "2608_RYM.WAV", MAX_PATH);
-			if (!file.Open(buf, FileIO::readonly))
+			if (!file.Open(buf, "rb"))
 				break;
 		}
 		
@@ -1300,14 +1300,14 @@ bool OPNA::LoadRhythmSample(const char* path)
 			uint16_t size;
 		} whdr;
 
-		file.Seek(0x10, FileIO::begin);
+		file.Seek(0x10, SEEK_SET);
 		file.Read(&whdr, sizeof(whdr));
 		
 		uint8_t subchunkname[4];
 		fsize = 4 + whdr.chunksize - sizeof(whdr);
 		do 
 		{
-			file.Seek(fsize, FileIO::current);
+			file.Seek(fsize, SEEK_CUR);
 			file.Read(&subchunkname, 4);
 			file.Read(&fsize, 4);
 		} while (memcmp("data", subchunkname, 4));
