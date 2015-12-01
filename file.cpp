@@ -1,7 +1,7 @@
 //	$Id: file.cpp,v 1.6 1999/12/28 11:14:05 cisc Exp $
 
-#include "headers.h"
-#include "File.h"
+#include "stdafx.h"
+#include "file.h"
 
 // ---------------------------------------------------------------------------
 //	構築/消滅
@@ -12,7 +12,7 @@ FileIO::FileIO()
 	flags = 0;
 }
 
-FileIO::FileIO(const char* filename, uint flg)
+FileIO::FileIO(const char* filename, uint32_t flg)
 {
 	flags = 0;
 	Open(filename, flg);
@@ -27,7 +27,7 @@ FileIO::~FileIO()
 //	ファイルを開く
 // ---------------------------------------------------------------------------
 
-bool FileIO::Open(const char* filename, uint flg)
+bool FileIO::Open(const char* filename, uint32_t flg)
 {
 	Close();
 
@@ -80,7 +80,7 @@ bool FileIO::CreateNew(const char* filename)
 //	ファイルを作り直す
 // ---------------------------------------------------------------------------
 
-bool FileIO::Reopen(uint flg)
+bool FileIO::Reopen(uint32_t flg)
 {
 	if (!(flags & open)) return false;
 	if ((flags & readonly) && (flg & create)) return false;
@@ -118,7 +118,7 @@ void FileIO::Close()
 //	ファイル殻の読み出し
 // ---------------------------------------------------------------------------
 
-int32 FileIO::Read(void* dest, int32 size)
+int32_t FileIO::Read(void* dest, int32_t size)
 {
 	if (!(GetFlags() & open))
 		return -1;
@@ -133,7 +133,7 @@ int32 FileIO::Read(void* dest, int32 size)
 //	ファイルへの書き出し
 // ---------------------------------------------------------------------------
 
-int32 FileIO::Write(const void* dest, int32 size)
+int32_t FileIO::Write(const void* dest, int32_t size)
 {
 	if (!(GetFlags() & open) || (GetFlags() & readonly))
 		return -1;
@@ -148,7 +148,7 @@ int32 FileIO::Write(const void* dest, int32 size)
 //	ファイルをシーク
 // ---------------------------------------------------------------------------
 
-bool FileIO::Seek(int32 pos, SeekMethod method)
+bool FileIO::Seek(int32_t pos, SeekMethod method)
 {
 	if (!(GetFlags() & open))
 		return false;
@@ -176,7 +176,7 @@ bool FileIO::Seek(int32 pos, SeekMethod method)
 //	ファイルの位置を得る
 // ---------------------------------------------------------------------------
 
-int32 FileIO::Tellp()
+int32_t FileIO::Tellp()
 {
 	if (!(GetFlags() & open))
 		return 0;
