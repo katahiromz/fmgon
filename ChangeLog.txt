@@ -45,3 +45,7 @@
 マクロ「PSG_SAMPLETYPE」を「int16_t」にする。
 コード「#include "misc.h"」をファイル「stdafx.h」の中へ移動。
 コードの整形。
+
+2015年12月2日
+ファイル「YM2203.h」「YM2203.cpp」「YM2203_Timbre.h」
+「YM2203_Timbre.cpp」を追加。
