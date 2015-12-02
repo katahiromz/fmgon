@@ -48,4 +48,4 @@
 
 2015年12月2日
 ファイル「YM2203.h」「YM2203.cpp」「YM2203_Timbre.h」
-「YM2203_Timbre.cpp」を追加。
+「YM2203_Timbre.cpp」「sample.cpp」を追加。
