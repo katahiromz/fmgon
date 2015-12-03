@@ -103,18 +103,18 @@ void VskPhrase::realize(VskSoundPlayer *player) {
         int tone = -1;
 
         for (auto& note : m_notes) {
-            // change tone if necessary
-            if (tone != note.m_tone) {
-                const auto new_tone = note.m_tone;
-                assert((0 <= new_tone) && (new_tone < NUM_TONES));
-                auto& timbre = m_setting.m_timbre;
-                timbre.set(ym2203_tone_table[new_tone]);
-                ym.set_timbre(ch, &timbre);
-                tone = new_tone;
-            }
-
             // do key on
             if (note.m_key != -1) {
+                // change tone if necessary
+                if (tone != note.m_tone) {
+                    const auto new_tone = note.m_tone;
+                    assert((0 <= new_tone) && (new_tone < NUM_TONES));
+                    auto& timbre = m_setting.m_timbre;
+                    timbre.set(ym2203_tone_table[new_tone]);
+                    ym.set_timbre(ch, &timbre);
+                    tone = new_tone;
+                }
+
                 ym.set_pitch(ch, note.m_octave, note.m_key);
                 ym.set_volume(ch, 15);
                 ym.key_on(ch);
