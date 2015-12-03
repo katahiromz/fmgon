@@ -200,7 +200,7 @@ void MakeLFOTable() {
             double pmb = pms[type][i];
             for (int j=0; j<FM_LFOENTS; j++)
             {
-                double v = pow(2.0, pmb * (2 * j - FM_LFOENTS+1) / (FM_LFOENTS-1));
+                //double v = pow(2.0, pmb * (2 * j - FM_LFOENTS+1) / (FM_LFOENTS-1));
                 double w = 0.6 * pmb * sin(2 * j * 3.14159265358979323846 / FM_LFOENTS) + 1;
 //              pmtable[type][i][j] = int(0x10000 * (v - 1));
 //              if (type == 0)
@@ -311,9 +311,10 @@ void Operator::MakeTable() {
         v = (v + 2) & ~3;
         *p++ = v;
         *p++ = -v;
-    }
+        }
     while (p < cltable + FM_CLENTS) {
-        *p++ = p[-512] / 2;
+        *p = *(p - 512) / 2;
+        ++p;
     }
 
 //  for (i=0; i<13*256; i++)
@@ -365,6 +366,9 @@ void Operator::Prepare() {
             break;
         case release:
             SetEGRate(Min(63, rr_ + key_scale_rate_));
+            break;
+        case next:
+        case off:
             break;
         }
 
@@ -531,6 +535,10 @@ void FM::Operator::EGCalc() {
                     break;
                 case release:
                     ShiftPhase(off);
+                    break;
+                case next:
+                case attack:
+                case off:
                     break;
                 }
             }

@@ -7,6 +7,7 @@
 using std::shared_ptr;
 using std::make_shared;
 using std::unique_ptr;
+#include <iostream>
 
 // C headers
 #include <cstdlib>

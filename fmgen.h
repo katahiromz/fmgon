@@ -25,7 +25,7 @@
 
 #define FM_TLENTS       (1 << FM_TLBITS)
 #define FM_LFOENTS      (1 << FM_LFOBITS)
-#define FM_TLPOS        (FM_TLENTS/4)
+#define FM_TLPOS        (FM_TLENTS / 4)
 
 //  ƒTƒCƒ“”g‚Ì¸“x‚Í 2^(1/256)
 #define FM_CLENTS       (0x1000 * 2)    // sin + TL + LFO

@@ -10,23 +10,23 @@
 // ---------------------------------------------------------------------------
 //  定数その２
 //
-#define FM_PI           3.14159265358979323846
+#define FM_PI               3.14159265358979323846
 
-#define FM_SINEPRESIS   2           // EGとサイン波の精度の差  0(低)-2(高)
+#define FM_SINEPRESIS       2       // EGとサイン波の精度の差  0(低)-2(高)
 
 
-#define FM_OPSINBITS    10
-#define FM_OPSINENTS    (1 << FM_OPSINBITS)
+#define FM_OPSINBITS        10
+#define FM_OPSINENTS        (1 << FM_OPSINBITS)
 
-#define FM_EGCBITS      18          // eg の count のシフト値
-#define FM_LFOCBITS     14
+#define FM_EGCBITS          18      // eg の count のシフト値
+#define FM_LFOCBITS         14
 
 #ifdef FM_TUNEBUILD
-    #define FM_PGBITS      2
-    #define FM_RATIOBITS   0
+    #define FM_PGBITS       2
+    #define FM_RATIOBITS    0
 #else
-    #define FM_PGBITS      9
-    #define FM_RATIOBITS   7           // 8-12 くらいまで？
+    #define FM_PGBITS       9
+    #define FM_RATIOBITS    7       // 8-12 くらいまで？
 #endif
 
 #define FM_EGBITS       16

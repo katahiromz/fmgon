@@ -74,7 +74,7 @@ struct YM2203_Timbre {
 #define NUM_TONES   62
 
 // tone data
-extern const int16_t tone_table[NUM_TONES][5][10];
+extern int16_t ym2203_tone_table[NUM_TONES][5][10];
 
 //////////////////////////////////////////////////////////////////////////////
 

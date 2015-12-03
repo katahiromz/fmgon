@@ -89,8 +89,8 @@ struct YM2203 {
     void init(uint32_t clock, uint32_t rate);
     void set_pitch(int ch, int octave, int key);
     void set_volume(int ch, int volume);
-    void note_on(int ch);
-    void note_off(int ch);
+    void key_on(int ch);
+    void key_off(int ch);
 
     bool load_rhythm_data(const char *path) {
         return m_opna.LoadRhythmSample(path);
