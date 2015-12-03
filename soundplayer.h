@@ -7,7 +7,7 @@
 #define FMGON_SOUNDPLAYER_H
 
 //////////////////////////////////////////////////////////////////////////////
-// OpenAL + ALUT
+// OpenAL + ALUT --- portable audio libraries
 
 #define ALUT_STATIC
 #include <AL/alut.h>
@@ -18,7 +18,7 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-// pevent
+// pevent --- portable event objects
 
 #ifdef _WIN32
     #include "win32_pevent.h"
