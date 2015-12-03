@@ -78,8 +78,7 @@
 //      各音源の音量を＋－方向に調節する．標準値は 0.
 //      単位は約 1/2 dB，有効範囲の上限は 20 (10dB)
 //
-namespace FM
-{
+namespace FM {
     //  OPN Base -------------------------------------------------------
     class OPNBase : public Timer {
     public:
@@ -393,18 +392,18 @@ namespace FM
 
         Channel4    ch[3];
     }; // class OPN2
+
+    inline void OPNBase::RebuildTimeTable() {
+        int p = prescale;
+        prescale = -1;
+        SetPrescaler(p);
+    }
+
+    inline void OPNBase::SetVolumePSG(int db) {
+        psg.SetVolume(db);
+    }
 } // namespace FM
 
 // ---------------------------------------------------------------------------
-
-inline void FM::OPNBase::RebuildTimeTable() {
-    int p = prescale;
-    prescale = -1;
-    SetPrescaler(p);
-}
-
-inline void FM::OPNBase::SetVolumePSG(int db) {
-    psg.SetVolume(db);
-}
 
 #endif // FM_OPNA_H
