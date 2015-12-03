@@ -9,6 +9,10 @@
 //////////////////////////////////////////////////////////////////////////////
 
 YM2203_Timbre::YM2203_Timbre(const int16_t array[5][10]) {
+    set(array);
+}
+
+void YM2203_Timbre::set(const int16_t array[5][10]) {
     algorithm =  array[0][0]       & 0x07;
     feedback  = (array[0][0] >> 3) & 0x07;
     opMask    =  array[0][1] & 0x0F;
@@ -24,7 +28,7 @@ YM2203_Timbre::YM2203_Timbre(const int16_t array[5][10]) {
     setKS((uint8_t)array[1][6], (uint8_t)array[2][6], (uint8_t)array[3][6], (uint8_t)array[4][6]);
     setML((uint8_t)array[1][7], (uint8_t)array[2][7], (uint8_t)array[3][7], (uint8_t)array[4][7]);
     setDT( (int8_t)array[1][8],  (int8_t)array[2][8],  (int8_t)array[3][8],  (int8_t)array[4][8]);
-}
+} // YM2203_Timbre::set
 
 //////////////////////////////////////////////////////////////////////////////
 

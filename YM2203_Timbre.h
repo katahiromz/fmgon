@@ -55,6 +55,8 @@ struct YM2203_Timbre {
 
     YM2203_Timbre() { }
     YM2203_Timbre(const int16_t array[5][10]);
+    void set(const int16_t array[5][10]);
+
     void setAR(uint8_t op1, uint8_t op2, uint8_t op3, uint8_t op4);
     void setDR(uint8_t op1, uint8_t op2, uint8_t op3, uint8_t op4);
     void setSR(uint8_t op1, uint8_t op2, uint8_t op3, uint8_t op4);
