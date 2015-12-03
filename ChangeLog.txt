@@ -1,3 +1,5 @@
+(Japanese, Shift_JIS)
+
 2015年12月1日 片山博文MZ
 
 ファイル「readme.txt」を「OldReadMe.txt」に改名。
@@ -46,10 +48,10 @@
 コード「#include "misc.h"」をファイル「stdafx.h」の中へ移動。
 コードの整形。
 
-2015年12月2日
+2015年12月2日 片山博文MZ
 ファイル「YM2203.h」「YM2203.cpp」「YM2203_Timbre.h」
 「YM2203_Timbre.cpp」「sample.cpp」を追加。
 ファイル「pevent.h」「posix_pevent.cpp」「win32_pevent.h」を追加。
 
-2015年12月3日
+2015年12月3日 片山博文MZ
 改良。
