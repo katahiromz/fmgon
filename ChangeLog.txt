@@ -50,3 +50,6 @@
 ファイル「YM2203.h」「YM2203.cpp」「YM2203_Timbre.h」
 「YM2203_Timbre.cpp」「sample.cpp」を追加。
 ファイル「pevent.h」「posix_pevent.cpp」「win32_pevent.h」を追加。
+
+2015年12月3日
+改良。
