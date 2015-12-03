@@ -4,8 +4,8 @@
 // ---------------------------------------------------------------------------
 //  $Id: fmgeninl.h,v 1.26 2003/06/12 13:14:36 cisc Exp $
 
-#ifndef FM_GEN_INL_H
-#define FM_GEN_INL_H
+#ifndef FMGON_FMGENINL_H
+#define FMGON_FMGENINL_H
 
 // ---------------------------------------------------------------------------
 //  íËêîÇªÇÃÇQ
@@ -232,4 +232,4 @@ inline void Chip::SetPML(uint32_t l) {
 
 } // namespace FM
 
-#endif // FM_GEN_INL_H
+#endif  // ndef FMGON_FMGENINL_H
