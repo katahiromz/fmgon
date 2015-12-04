@@ -94,7 +94,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
 
     // create wave data
     uint32_t isample = 0;
-    auto size = uint32_t(m_goal * SAMPLERATE * 2);
+    auto size = uint32_t((m_goal + 1) * SAMPLERATE * 2);
     unique_ptr<FM_SAMPLETYPE[]> data(new FM_SAMPLETYPE[size]);
 
     if (m_setting.m_fm) {
@@ -129,6 +129,8 @@ void VskPhrase::realize(VskSoundPlayer *player) {
 
             // do key off
             ym.key_off(ch);
+            ym.mix(NULL, 0);
+            ym.count(0);
         }
     } else {
         int ch = SSG_CH_A;
@@ -152,7 +154,18 @@ void VskPhrase::realize(VskSoundPlayer *player) {
 
             // do key off
             ym.key_off(ch);
+            ym.mix(NULL, 0);
+            ym.count(0);
         }
+    }
+
+    // reverb of 1sec
+    {
+        auto sec = 1;
+        auto nsamples = int(SAMPLERATE * sec);
+        ym.mix(&data[isample], nsamples * 2);
+        ym.count(uint32_t(sec * 1000 * 1000));
+        isample += nsamples;
     }
 
     // generate an OpenAL buffer
@@ -236,8 +249,8 @@ void VskSoundPlayer::play(VskScoreBlock& block) {
             }
             if (m_playing_music) {
                 m_playing_music = false;
+                alutSleep(1.0);
             }
-            alutSleep(1.0);
         },
         0
     ).detach();
