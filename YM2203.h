@@ -78,7 +78,6 @@
 #define ADDR_FM_FREQ_L          0xA0
 #define ADDR_FM_FREQ_H          0xA4
 #define ADDR_FM_FB_ALGORITHM    0xB0
-#define ADDR_FM_LR_AMS_PMS      0xB4
 
 //////////////////////////////////////////////////////////////////////////////
 // YM2203
