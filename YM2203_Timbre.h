@@ -52,6 +52,12 @@ struct YM2203_Timbre {
     uint8_t keyScale[OPERATOR_NUM];     // Key Scale
     uint8_t multiple[OPERATOR_NUM];     // Multiple
     int8_t  detune[OPERATOR_NUM];       // Detune
+    uint8_t     waveForm;
+    uint8_t     sync;
+    uint16_t    speed;
+    int8_t      pmd;
+    int8_t      amd;
+    uint8_t     pms;
 
     YM2203_Timbre() { }
     YM2203_Timbre(const int16_t array[5][10]);

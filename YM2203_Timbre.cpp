@@ -13,10 +13,16 @@ YM2203_Timbre::YM2203_Timbre(const int16_t array[5][10]) {
 }
 
 void YM2203_Timbre::set(const int16_t array[5][10]) {
-    algorithm =  array[0][0]       & 0x07;
-    feedback  = (array[0][0] >> 3) & 0x07;
-    opMask    =  array[0][1] & 0x0F;
-    // [0][2-7] : ビブラート、トレモロ関係の設定は未対応
+    algorithm   =  array[0][0]       & 0x07;
+    feedback    = (array[0][0] >> 3) & 0x07;
+    opMask      =  array[0][1] & 0x0F;
+    // [0][2-7] : ビブラート、トレモロ関係
+    waveForm    = uint8_t(array[0][2] & 0x03);
+    sync        = uint8_t(array[0][3] & 0x01);
+    speed       = uint16_t(array[0][4] & 0x3FFF);
+    pmd         = int8_t(array[0][5]);
+    amd         = int8_t(array[0][6]);
+    pms         = uint8_t(array[0][7]);
     // [0][8,9] : 未使用
     // [1-4][9] : ビブラート関係の設定は未対応
     setAR((uint8_t)array[1][0], (uint8_t)array[2][0], (uint8_t)array[3][0], (uint8_t)array[4][0]);

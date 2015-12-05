@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "soundplayer.h"
 
-#define CLOCK       4800000
+#define CLOCK       4000000
 #define SAMPLERATE  44100
 
 //////////////////////////////////////////////////////////////////////////////
@@ -16,9 +16,9 @@ float VskNote::get_sec(int tempo, int length) const {
     assert(tempo != 0);
     // NOTE: 24 is the length of a quarter note
     if (m_dot) {
-        sec = float(length * (60.0 * 1.5 * 4 / 24)) / tempo;
+        sec = float(length * (60.0 * 2 * 1.5 / 24)) / tempo;
     } else {
-        sec = float(length * (60.0 * 4 / 24)) / tempo;
+        sec = float(length * (60.0 * 2 / 24)) / tempo;
     }
     return sec;
 } // VskNote::get_sec
@@ -123,6 +123,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             // render sound
             auto sec = note.m_sec;
             auto nsamples = int(SAMPLERATE * sec);
+            memset(&data[isample], 0, nsamples * 2 * sizeof(FM_SAMPLETYPE));
             ym.mix(&data[isample], nsamples * 2);
             ym.count(uint32_t(sec * 1000 * 1000));
             isample += nsamples;
@@ -148,6 +149,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             // render sound
             auto sec = note.m_sec;
             auto nsamples = int(SAMPLERATE * sec);
+            memset(&data[isample], 0, nsamples * 2 * sizeof(FM_SAMPLETYPE));
             ym.mix(&data[isample], nsamples * 2);
             ym.count(uint32_t(sec * 1000 * 1000));
             isample += nsamples;
@@ -311,7 +313,7 @@ void VskSoundPlayer::free_beep() {
 
         // NOTE: 24 is the length of a quarter note
         phrase->m_setting.m_length = 24;
-        phrase->m_setting.m_tone = 7;   // @7 FLUTE
+        phrase->m_setting.m_tone = 15;   // @7 FLUTE
 
         phrase->add_note('C');
         phrase->add_note('D');
