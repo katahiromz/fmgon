@@ -272,6 +272,15 @@ void YM2203::set_timbre(int ch, YM2203_Timbre *timbre) {
     data = (((timbre->feedback & 0x07) << 3) | (timbre->algorithm & 0x07));
     write_reg(addr, data);
 
+    // TODO: LFO
+    //addr = ADDR_FM_LFO_ON_SPEED;
+    //data = ...
+    //write_reg(addr, data);
+    //
+    //addr = ADDR_FM_LR_AMS_PMS;
+    //data = ...;
+    //write_reg(addr, data);
+
     m_fm_timbres[ch] = timbre;
 } // YM2203::set_timbre
 
