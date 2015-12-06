@@ -65,6 +65,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // register address (FM)
 
+#define ADDR_FM_LFO_ON_SPEED    0x22
 #define ADDR_FM_KEYON           0x28
 #define ADDR_FM_PRESCALER_1     0x2D
 #define ADDR_FM_PRESCALER_2     0x2E
@@ -78,6 +79,7 @@
 #define ADDR_FM_FREQ_L          0xA0
 #define ADDR_FM_FREQ_H          0xA4
 #define ADDR_FM_FB_ALGORITHM    0xB0
+#define ADDR_FM_LR_AMS_PMS      0xB4
 
 //////////////////////////////////////////////////////////////////////////////
 // YM2203
@@ -89,8 +91,8 @@ struct YM2203 {
     void init(uint32_t clock, uint32_t rate);
     void set_pitch(int ch, int octave, int key);
     void set_volume(int ch, int volume);
-    void key_on(int ch);
-    void key_off(int ch);
+    void note_on(int ch);
+    void note_off(int ch);
 
     bool load_rhythm_data(const char *path) {
         return m_opna.LoadRhythmSample(path);

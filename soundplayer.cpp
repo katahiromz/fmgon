@@ -118,7 +118,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
 
                 ym.set_pitch(ch, note.m_octave, note.m_key);
                 ym.set_volume(ch, 15);
-                ym.key_on(ch);
+                ym.note_on(ch);
             }
 
             // render sound
@@ -129,7 +129,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             isample += nsamples;
 
             // do key off
-            ym.key_off(ch);
+            ym.note_off(ch);
             ym.mix(NULL, 0);
             ym.count(0);
         }
@@ -143,7 +143,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             if (note.m_key != -1) {
                 ym.set_pitch(ch, note.m_octave, note.m_key);
                 ym.set_volume(ch, 15);
-                ym.key_on(ch);
+                ym.note_on(ch);
             }
 
             // render sound
@@ -154,7 +154,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             isample += nsamples;
 
             // do key off
-            ym.key_off(ch);
+            ym.note_off(ch);
             ym.mix(NULL, 0);
             ym.count(0);
         }
@@ -164,7 +164,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
     {
         auto sec = 1;
         auto nsamples = int(SAMPLERATE * sec);
-        ym.mix(&data[isample], nsamples * 2);
+        ym.mix(&data[isample * 2], nsamples);
         ym.count(uint32_t(sec * 1000 * 1000));
         isample += nsamples;
     }
@@ -312,7 +312,7 @@ void VskSoundPlayer::free_beep() {
 
         // NOTE: 24 is the length of a quarter note
         phrase->m_setting.m_length = 24;
-        phrase->m_setting.m_tone = 7;   // @7 FLUTE
+        phrase->m_setting.m_tone = 15;   // @15 DESCENT
 
         phrase->add_note('C');
         phrase->add_note('D');

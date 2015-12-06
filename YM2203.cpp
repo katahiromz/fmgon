@@ -43,7 +43,7 @@ void YM2203::init(uint32_t clock, uint32_t rate) {
     write_reg(addr, data);
 }
 
-void YM2203::key_on(int ch) {
+void YM2203::note_on(int ch) {
     uint32_t addr, data;
     if ((FM_CH1 <= ch) && (ch <= FM_CH3)) {
         if (m_fm_timbres[ch] == NULL) {
@@ -74,7 +74,7 @@ void YM2203::key_on(int ch) {
     }
 }
 
-void YM2203::key_off(int ch) {
+void YM2203::note_off(int ch) {
     uint32_t addr, data;
     if ((FM_CH1 <= ch) && (ch <= FM_CH3)) {
         addr = ADDR_FM_KEYON;
@@ -273,6 +273,6 @@ void YM2203::set_timbre(int ch, YM2203_Timbre *timbre) {
     write_reg(addr, data);
 
     m_fm_timbres[ch] = timbre;
-}
+} // YM2203::set_timbre
 
 //////////////////////////////////////////////////////////////////////////////

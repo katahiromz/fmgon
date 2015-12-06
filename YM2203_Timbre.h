@@ -52,12 +52,13 @@ struct YM2203_Timbre {
     uint8_t keyScale[OPERATOR_NUM];     // Key Scale
     uint8_t multiple[OPERATOR_NUM];     // Multiple
     int8_t  detune[OPERATOR_NUM];       // Detune
-    uint8_t     waveForm;
-    uint8_t     sync;
-    uint16_t    speed;
-    int8_t      pmd;
-    int8_t      amd;
-    uint8_t     pms;
+
+    uint8_t     waveForm;               // Wave Form
+    uint8_t     sync;                   // LFO Sync
+    uint16_t    speed;                  // LFO Speed
+    int8_t      pmd;                    // Pitch Modulation Depth (PMD)
+    int8_t      amd;                    // Amplitude Modulation Depth (AMD)
+    uint8_t     pms;                    // Pitch Modulation Sensitivity (PMS)
 
     YM2203_Timbre() { }
     YM2203_Timbre(const int16_t array[5][10]);
