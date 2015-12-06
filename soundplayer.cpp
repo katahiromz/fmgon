@@ -16,9 +16,9 @@ float VskNote::get_sec(int tempo, int length) const {
     assert(tempo != 0);
     // NOTE: 24 is the length of a quarter note
     if (m_dot) {
-        sec = float(length * (60.0 * 2 * 1.5 / 24)) / tempo;
+        sec = float(length * (60.0 * 1.5 / 24)) / tempo;
     } else {
-        sec = float(length * (60.0 * 2 / 24)) / tempo;
+        sec = float(length * (60.0 / 24)) / tempo;
     }
     return sec;
 } // VskNote::get_sec
@@ -96,6 +96,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
     uint32_t isample = 0;
     auto size = uint32_t((m_goal + 1) * SAMPLERATE * 2);
     unique_ptr<FM_SAMPLETYPE[]> data(new FM_SAMPLETYPE[size]);
+    memset(&data[0], 0, size * sizeof(FM_SAMPLETYPE));
 
     if (m_setting.m_fm) {
         int ch = FM_CH1;
@@ -123,8 +124,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             // render sound
             auto sec = note.m_sec;
             auto nsamples = int(SAMPLERATE * sec);
-            memset(&data[isample], 0, nsamples * 2 * sizeof(FM_SAMPLETYPE));
-            ym.mix(&data[isample], nsamples * 2);
+            ym.mix(&data[isample * 2], nsamples);
             ym.count(uint32_t(sec * 1000 * 1000));
             isample += nsamples;
 
@@ -149,8 +149,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             // render sound
             auto sec = note.m_sec;
             auto nsamples = int(SAMPLERATE * sec);
-            memset(&data[isample], 0, nsamples * 2 * sizeof(FM_SAMPLETYPE));
-            ym.mix(&data[isample], nsamples * 2);
+            ym.mix(&data[isample * 2], nsamples);
             ym.count(uint32_t(sec * 1000 * 1000));
             isample += nsamples;
 
@@ -246,7 +245,7 @@ void VskSoundPlayer::play(VskScoreBlock& block) {
                     }
                 }
 
-                auto msec = uint32_t(goal * 1000.0 / 2);
+                auto msec = uint32_t(goal * 1000.0);
                 m_stopping_event.wait_for_event(msec);
             }
             if (m_playing_music) {
@@ -313,7 +312,7 @@ void VskSoundPlayer::free_beep() {
 
         // NOTE: 24 is the length of a quarter note
         phrase->m_setting.m_length = 24;
-        phrase->m_setting.m_tone = 15;   // @7 FLUTE
+        phrase->m_setting.m_tone = 7;   // @7 FLUTE
 
         phrase->add_note('C');
         phrase->add_note('D');
