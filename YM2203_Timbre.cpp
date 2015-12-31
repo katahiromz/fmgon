@@ -17,6 +17,10 @@ void YM2203_Timbre::set(const int16_t array[5][10]) {
     feedback    = (array[0][0] >> 3) & 0x07;
     opMask      =  array[0][1] & 0x0F;
     // [0][2-7] : ビブラート、トレモロ関係
+    ams[OPERATOR_1] = (uint8_t)array[1][9];
+    ams[OPERATOR_2] = (uint8_t)array[2][9];
+    ams[OPERATOR_3] = (uint8_t)array[3][9];
+    ams[OPERATOR_4] = (uint8_t)array[4][9];
     waveForm    = uint8_t(array[0][2] & 0x03);
     sync        = uint8_t(array[0][3] & 0x01);
     speed       = uint16_t(array[0][4] & 0x3FFF);

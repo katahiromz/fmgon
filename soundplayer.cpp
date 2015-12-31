@@ -6,8 +6,156 @@
 #include "stdafx.h"
 #include "soundplayer.h"
 
-#define CLOCK       4000000
+#define CLOCK       8000000
 #define SAMPLERATE  44100
+
+#define LFO_INTERVAL 150
+
+class LFOctrl {
+    int m_waveform;
+    int m_qperiod; // quarter of period
+    int m_count;
+    int m_phase; // 0, 1, 2 or 3
+    float m_adj_p_max;
+    float m_adj_v_max[4];
+    float m_adj_p_diff;
+    float m_adj_v_diff[4];
+public:
+    float m_adj_p; // for pitch
+    float m_adj_v[4]; // for volume
+
+public:
+    LFOctrl() { }
+
+    void init_for_timbre(YM2203_Timbre *p_timbre) {
+        int i;
+        m_waveform = p_timbre->waveForm;
+        m_qperiod = (p_timbre->speed)?900*LFO_INTERVAL/(4*p_timbre->speed):0;
+        //m_count = 0;
+        m_phase = 0;
+        m_adj_p_max = p_timbre->pmd * (float)p_timbre->pms / 2.0; // TBD
+        for (i=0; i<4; i++)
+            m_adj_v_max[i] = p_timbre->amd * (float)p_timbre->ams[i] / 2; // TBD
+        init_for_phase(true);
+    }
+
+    void init_for_keyon(YM2203_Timbre *p_timbre) {
+        if (p_timbre->sync) {
+            m_phase = 0;
+            init_for_phase();
+        }
+    }
+
+    void increment() {
+        int i;
+        if (0 == m_qperiod) {
+            return;
+        }
+        m_count++;
+        if (m_count < m_qperiod) {
+            m_adj_p += m_adj_p_diff;
+            for(i=0; i<4; i++) {
+                m_adj_v[i] += m_adj_v_diff[i];
+            }
+        } else {
+            m_phase = (m_phase + 1) & 3;
+            init_for_phase();
+        }
+    }
+
+private:
+    void init_for_phase(bool flag_first = false) {
+        int i;
+        m_count = 0;
+        if (flag_first) {
+            switch (m_waveform) {
+            case 0: // saw
+                m_adj_p = 0;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = 0;
+                }
+                m_adj_p_diff = m_adj_p_max / (m_qperiod * 2);
+                for(i=0; i<4; i++) {
+                    m_adj_v_diff[i] = m_adj_v_max[i] / (m_qperiod * 2);
+                }
+                break;
+            case 1: // square
+                m_adj_p = -m_adj_p_max;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = -m_adj_v_max[i];
+                }
+                m_adj_p_diff = 0;
+                for(i=0; i<4; i++) {
+                    m_adj_v_diff[i] = 0;
+                }
+                break;
+            case 2: // triangle
+                m_adj_p = 0;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = 0;
+                }
+                m_adj_p_diff = m_adj_p_max / m_qperiod;
+                for(i=0; i<4; i++) {
+                    m_adj_v_diff[i] = m_adj_v_max[i] / m_qperiod;
+                }
+                break;
+            default: // sample and hold
+                //m_adj_p = m_adj_p_max * (rand() * 2.0 / RAND_MAX - 1);
+                //for(i=0; i<4; i++) m_adj_v[i] = m_adj_v_max[i] * (rand() * 2.0 / RAND_MAX - 1);
+                m_adj_p_diff = 0;
+                for(i=0; i<4; i++) {
+                    m_adj_v_diff[i] = 0;
+                }
+                break;
+            }
+        }
+        switch (m_waveform) {
+        case 0: // saw
+            if (0 == m_phase) {
+                m_adj_p = 0;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = 0;
+                }
+            } else if (2 == m_phase) {
+                m_adj_p = -m_adj_p;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = -m_adj_v[i];
+                }
+            }
+            break;
+        case 1: // square
+            if (0 == (m_phase & 1)) {
+                m_adj_p = -m_adj_p;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = -m_adj_v[i];
+                }
+            }
+            break;
+        case 2: // triangle
+            if (0 == m_phase) {
+                m_adj_p = 0;
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = 0;
+                }
+            } else if (1 == (m_phase & 1)) {
+                m_adj_p_diff = -m_adj_p_diff;
+                for(i=0; i<4; i++) {
+                    m_adj_v_diff[i] = -m_adj_v_diff[i];
+                }
+            }
+            break;
+        default: // sample and hold
+            if (0 == (m_phase & 1)) {
+                m_adj_p = m_adj_p_max * (rand() * 2.0 / RAND_MAX - 1);
+                for(i=0; i<4; i++) {
+                    m_adj_v[i] = m_adj_v_max[i] * (rand() * 2.0 / RAND_MAX - 1);
+                }
+            }
+            break;
+        }
+    }
+}; // LFOctrl
+
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -102,17 +250,19 @@ void VskPhrase::realize(VskSoundPlayer *player) {
         int ch = FM_CH1;
 
         int tone = -1;
+        LFOctrl lc;
 
         for (auto& note : m_notes) {
             // do key on
+            auto& timbre = m_setting.m_timbre;
             if (note.m_key != -1) {
                 // change tone if necessary
                 if (tone != note.m_tone) {
                     const auto new_tone = note.m_tone;
                     assert((0 <= new_tone) && (new_tone < NUM_TONES));
-                    auto& timbre = m_setting.m_timbre;
                     timbre.set(ym2203_tone_table[new_tone]);
                     ym.set_timbre(ch, &timbre);
+                    lc.init_for_timbre(&timbre);
                     tone = new_tone;
                 }
 
@@ -121,10 +271,28 @@ void VskPhrase::realize(VskSoundPlayer *player) {
                 ym.note_on(ch);
             }
 
+            lc.init_for_keyon(&timbre);
+
             // render sound
             auto sec = note.m_sec;
             auto nsamples = int(SAMPLERATE * sec);
-            ym.mix(&data[isample * 2], nsamples);
+            {
+                int unit;
+                while (nsamples) {
+                    unit = SAMPLERATE/LFO_INTERVAL;
+                    if (unit > nsamples) {
+                        unit = nsamples;
+                    }
+                    ym.mix(&data[isample * 2], unit);
+                    isample += unit;
+                    if (note.m_key != -1) {
+                        lc.increment();
+                        ym.set_volume(ch, 15, lc.m_adj_v[0], lc.m_adj_v[1], lc.m_adj_v[2], lc.m_adj_v[3]);
+                        ym.set_pitch(ch, note.m_octave, note.m_key, lc.m_adj_p);
+                    }
+                    nsamples -= unit;
+                }
+            }
             ym.count(uint32_t(sec * 1000 * 1000));
             isample += nsamples;
 
@@ -166,7 +334,6 @@ void VskPhrase::realize(VskSoundPlayer *player) {
         auto nsamples = int(SAMPLERATE * sec);
         ym.mix(&data[isample * 2], nsamples);
         ym.count(uint32_t(sec * 1000 * 1000));
-        isample += nsamples;
     }
 
     // generate an OpenAL buffer
@@ -303,16 +470,16 @@ void VskSoundPlayer::free_beep() {
 //////////////////////////////////////////////////////////////////////////////
 
 #ifdef SOUND_TEST
-    int main(void) {
+    int main(int ac, char *av[]) {
         alutInit(NULL, NULL);
 
         auto phrase = make_shared<VskPhrase>();
         phrase->m_setting.m_tempo = 120;
-        phrase->m_setting.m_octave = 4;
+        phrase->m_setting.m_octave = 3;
 
         // NOTE: 24 is the length of a quarter note
         phrase->m_setting.m_length = 24;
-        phrase->m_setting.m_tone = 15;   // @15 DESCENT
+        phrase->m_setting.m_tone = (ac<2)?15:atoi(av[1]); // @15 DESCENT
 
         phrase->add_note('C');
         phrase->add_note('D');

@@ -89,8 +89,9 @@ struct YM2203 {
     ~YM2203() { }
 
     void init(uint32_t clock, uint32_t rate);
-    void set_pitch(int ch, int octave, int key);
-    void set_volume(int ch, int volume);
+    void set_pitch(int ch, int octave, int key, int adj = 0);
+    void set_volume(int ch, int volume, int adj1 = 0, int adj2 = 0,
+        int adj3 = 0, int adj4 = 0);
     void note_on(int ch);
     void note_off(int ch);
 

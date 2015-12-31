@@ -90,17 +90,17 @@ void YM2203::note_off(int ch) {
     }
 }
 
-void YM2203::set_pitch(int ch, int octave, int key) {
+void YM2203::set_pitch(int ch, int octave, int key, int adj) {
     uint32_t addr, data;
     if ((FM_CH1 <= ch) && (ch <= FM_CH3)) {
         addr = ADDR_FM_FREQ_H + ch;
         data = (
             ((octave & 0x07) << 3) |
-            ((FM_PITCH_TABLE[key] >> 8) & 0x07)
+            (((FM_PITCH_TABLE[key] + adj) >> 8) & 0x07)
         );
         write_reg(addr, data);
         addr = ADDR_FM_FREQ_L + ch;
-        data = (uint8_t)FM_PITCH_TABLE[key];
+        data = (uint8_t)(FM_PITCH_TABLE[key] + adj);
         write_reg(addr, data);
     } else if ((SSG_CH_A <= ch) && (ch <= SSG_CH_C)) {
         uint16_t ssg_f = SSG_PITCH_TABLE[key];
@@ -119,7 +119,9 @@ void YM2203::set_pitch(int ch, int octave, int key) {
     }
 }
 
-void YM2203::set_volume(int ch, int volume) {
+void YM2203::set_volume(int ch, int volume,
+    int adj1, int adj2, int adj3, int adj4)
+{
     static const uint8_t OP_OFFSET[] = {0x00, 0x08, 0x04, 0x0C};
     uint32_t addr, data;
 
@@ -137,24 +139,24 @@ void YM2203::set_volume(int ch, int volume) {
         uint8_t attenate = uint8_t(uint8_t(15 - volume) * 3);
 
         addr = ADDR_FM_TL + uint8_t(ch) + OP_OFFSET[OPERATOR_4];
-        data = ((m_fm_timbres[ch]->tl[OPERATOR_4] + attenate) & 0x7F);
+        data = ((m_fm_timbres[ch]->tl[OPERATOR_4] + attenate - adj4) & 0x7F);
         write_reg(addr, data);
 
         if (algorithm >= ALGORITHM_4) {
             addr = ADDR_FM_TL + uint8_t(ch) + OP_OFFSET[OPERATOR_2];
-            data = ((m_fm_timbres[ch]->tl[OPERATOR_2] + attenate) & 0x7F);
+            data = ((m_fm_timbres[ch]->tl[OPERATOR_2] + attenate - adj2) & 0x7F);
             write_reg(addr, data);
         }
 
         if (algorithm >= ALGORITHM_5) {
             addr = ADDR_FM_TL + uint8_t(ch) + OP_OFFSET[OPERATOR_3];
-            data = ((m_fm_timbres[ch]->tl[OPERATOR_3] + attenate) & 0x7F);
+            data = ((m_fm_timbres[ch]->tl[OPERATOR_3] + attenate - adj3) & 0x7F);
             write_reg(addr, data);
         }
 
         if (algorithm == ALGORITHM_7) {
             addr = ADDR_FM_TL + (uint8_t)ch + OP_OFFSET[OPERATOR_1];
-            data = ((m_fm_timbres[ch]->tl[OPERATOR_1] + attenate) & 0x7F);
+            data = ((m_fm_timbres[ch]->tl[OPERATOR_1] + attenate - adj1) & 0x7F);
             write_reg(addr, data);
         }
     } else if ((SSG_CH_A <= ch) && (ch <= SSG_CH_C)) {

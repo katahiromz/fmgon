@@ -53,6 +53,9 @@ struct YM2203_Timbre {
     uint8_t multiple[OPERATOR_NUM];     // Multiple
     int8_t  detune[OPERATOR_NUM];       // Detune
 
+    // Amplitude Modulation Sensitivity (AMS)
+    uint8_t ams[OPERATOR_NUM]; 
+
     uint8_t     waveForm;               // Wave Form
     uint8_t     sync;                   // LFO Sync
     uint16_t    speed;                  // LFO Speed
