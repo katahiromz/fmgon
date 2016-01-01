@@ -1,4 +1,4 @@
-# Makefile.g++
+# Makefile for fmgon
 
 DOTOBJ = .o
 DOTEXE = .exe   # Windows
