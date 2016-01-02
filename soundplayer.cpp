@@ -37,7 +37,7 @@ public:
         }
         //m_count = 0;
         m_phase = 0;
-        m_adj_p_max = p_timbre->pmd * (float)p_timbre->pms / 2.0; // TBD
+        m_adj_p_max = p_timbre->pmd * (float)p_timbre->pms / 2.0f; // TBD
         for (i = 0; i < 4; ++i) {
             m_adj_v_max[i] =
                 p_timbre->amd * (float)p_timbre->ams[i] / 2; // TBD
@@ -154,9 +154,13 @@ protected:
             break;
         default: // sample and hold
             if (0 == (m_phase & 1)) {
-                m_adj_p = m_adj_p_max * (rand() * 2.0 / RAND_MAX - 1);
+                m_adj_p = float(
+                    m_adj_p_max * (rand() * 2.0 / RAND_MAX - 1)
+                );
                 for (i = 0; i < 4; ++i) {
-                    m_adj_v[i] = m_adj_v_max[i] * (rand() * 2.0 / RAND_MAX - 1);
+                    m_adj_v[i] = float(
+                        m_adj_v_max[i] * (rand() * 2.0 / RAND_MAX - 1)
+                    );
                 }
             }
             break;
@@ -166,20 +170,20 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////////
 
-float VskNote::get_sec(int tempo, int length) const {
+float VskNote::get_sec(int tempo, float length) const {
     float sec;
     assert(tempo != 0);
     // NOTE: 24 is the length of a quarter note
     if (m_dot) {
-        sec = float(length * (60.0 * 1.5 / 24)) / tempo;
+        sec = length * (60.0f * 1.5f / 24.0f) / tempo;
     } else {
-        sec = float(length * (60.0 / 24)) / tempo;
+        sec = length * (60.0f / 24.0f) / tempo;
     }
     return sec;
 } // VskNote::get_sec
 
 void VskNote::set_key_from_char(char ch) {
-    if (ch != 'R') {
+    if ((ch != 'R') && (ch != 0)) {
         static const char keys[KEY_NUM + 1] = "C+D+EF+G+A+B";
 
         const char *ptr = strchr(keys, ch);
@@ -274,18 +278,18 @@ void VskPhrase::realize(VskSoundPlayer *player) {
                 }
 
                 ym.set_pitch(ch, note.m_octave, note.m_key);
-                ym.set_volume(ch, 15);
+                ym.set_volume(ch, int(note.m_volume));
                 ym.note_on(ch);
             }
 
             lc.init_for_keyon(&timbre);
 
             // render sound
-            auto sec = note.m_sec;
+            auto sec = note.m_sec * note.m_quantity / 8.0f;
             auto nsamples = int(SAMPLERATE * sec);
             int unit;
             while (nsamples) {
-                unit = SAMPLERATE/LFO_INTERVAL;
+                unit = SAMPLERATE / LFO_INTERVAL;
                 if (unit > nsamples) {
                     unit = nsamples;
                 }
@@ -297,8 +301,9 @@ void VskPhrase::realize(VskSoundPlayer *player) {
                         int(lc.m_adj_v[0]), int(lc.m_adj_v[1]),
                         int(lc.m_adj_v[2]), int(lc.m_adj_v[3]),
                     };
-                    ym.set_volume(ch, 15, adj);
-                    ym.set_pitch(ch, note.m_octave, note.m_key, lc.m_adj_p);
+                    ym.set_volume(ch, int(note.m_volume), adj);
+                    ym.set_pitch(ch, note.m_octave, note.m_key, 
+                                 int(lc.m_adj_p));
                 }
                 nsamples -= unit;
             }
@@ -306,9 +311,16 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             isample += nsamples;
 
             // do key off
+            sec = note.m_sec * (8.0f - note.m_quantity) / 8.0f;
+            nsamples = int(SAMPLERATE * sec);
             ym.note_off(ch);
-            ym.mix(NULL, 0);
-            ym.count(0);
+            unit = SAMPLERATE;
+            if (unit > nsamples) {
+                unit = nsamples;
+            }
+            ym.mix(&data[isample * 2], unit);
+            ym.count(uint32_t(sec * 1000 * 1000));
+            isample += nsamples;
         }
     } else {
         int ch = SSG_CH_A;
@@ -319,7 +331,7 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             // do key on
             if (note.m_key != -1) {
                 ym.set_pitch(ch, note.m_octave, note.m_key);
-                ym.set_volume(ch, 15);
+                ym.set_volume(ch, int(note.m_volume));
                 ym.note_on(ch);
             }
 
@@ -475,75 +487,5 @@ void VskSoundPlayer::free_beep() {
     alDeleteBuffers(1, &m_beep_buffer);
     alDeleteSources(1, &m_beep_source);
 }
-
-//////////////////////////////////////////////////////////////////////////////
-
-#ifdef SOUND_TEST
-    int main(int argc, char *argv[]) {
-        alutInit(NULL, NULL);
-
-        auto phrase = make_shared<VskPhrase>();
-        phrase->m_setting.m_tempo = 120;
-        phrase->m_setting.m_octave = 3;
-
-        // NOTE: 24 is the length of a quarter note
-        phrase->m_setting.m_length = 24;
-        if (argc <= 1) {
-            phrase->m_setting.m_tone = 15;  // @15 DESCENT
-        } else {
-            phrase->m_setting.m_tone = atoi(argv[1]);
-        }
-
-        phrase->add_note('C');
-        phrase->add_note('D');
-        phrase->add_note('E');
-        phrase->add_note('F');
-        phrase->add_note('E');
-        phrase->add_note('D');
-        phrase->add_note('C');
-        phrase->add_note('R');
-
-        phrase->add_note('E');
-        phrase->add_note('F');
-        phrase->add_note('G');
-        phrase->add_note('A');
-        phrase->add_note('G');
-        phrase->add_note('F');
-        phrase->add_note('E');
-        phrase->add_note('R');
-
-        phrase->add_note('C');
-        phrase->add_note('R');
-        phrase->add_note('C');
-        phrase->add_note('R');
-        phrase->add_note('C');
-        phrase->add_note('R');
-        phrase->add_note('C');
-        phrase->add_note('R');
-
-        phrase->m_setting.m_length = 12;
-        phrase->add_note('C');
-        phrase->add_note('C');
-        phrase->add_note('D');
-        phrase->add_note('D');
-        phrase->add_note('E');
-        phrase->add_note('E');
-        phrase->add_note('F');
-        phrase->add_note('F');
-        phrase->m_setting.m_length = 24;
-        phrase->add_note('E');
-        phrase->add_note('D');
-        phrase->add_note('C');
-        phrase->add_note('R');
-
-        VskScoreBlock block;
-        block.push_back(phrase);
-
-        VskSoundPlayer player;
-        player.play_and_wait(block);
-
-        alutExit();
-    } // main
-#endif  // def SOUND_TEST
 
 //////////////////////////////////////////////////////////////////////////////

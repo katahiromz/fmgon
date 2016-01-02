@@ -13,3 +13,7 @@ Release/
 *.opensdf
 *.user
 *.filters
+libfmgon.a
+libfmgon64.a
+fmgon_test
+fmgon_test.exe

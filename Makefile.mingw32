@@ -5,6 +5,7 @@ DOTEXE = .exe   # Windows
 #DOTEXE =       # Linux
 
 EXEFILE = fmgon_test$(DOTEXE)
+LIBFILE = libfmgon.a
 
 COMMON_HEADERS = \
 	stdafx.h \
@@ -21,16 +22,23 @@ OBJS = \
 	YM2203$(DOTOBJ) \
 	YM2203_Timbre$(DOTOBJ) \
 
+EXTRA_OBJ = fmgon_test$(DOTOBJ)
+
 CXX = g++ -std=c++11
-CXXFLAGS = -mconsole -DNDEBUG -DSOUND_TEST
+CXXFLAGS = -mconsole -DNDEBUG -Wall -pedantic
 
-LIBS=-lalut -lopenal32
-#LIBS=-lalut -lopenal32.dll -static
+#LIBS=-lalut -lopenal32
+LIBS=-lalut -lopenal32.dll -static
 
-all: $(EXEFILE)
+all: lib
+exe: $(EXEFILE)
+lib: $(LIBFILE)
 
-$(EXEFILE): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(EXEFILE) $(OBJS) $(LIBS)
+$(EXEFILE): $(OBJS) $(EXTRA_OBJ)
+	$(CXX) $(CXXFLAGS) -o $(EXEFILE) $(OBJS) $(EXTRA_OBJ) $(LIBS)
+$(LIBFILE): $(OBJS)
+	ar r $(LIBFILE) $(OBJS)
+	ranlib $(LIBFILE)
 
 fmgen$(DOTOBJ): $(COMMON_HEADERS) fmgen.cpp fmgen.h fmgeninl.h
 	$(CXX) -c $(CXXFLAGS) -o fmgen$(DOTOBJ) fmgen.cpp
@@ -50,6 +58,9 @@ YM2203$(DOTOBJ): $(COMMON_HEADERS) YM2203.cpp YM2203.h opna.h YM2203_Timbre.h
 	$(CXX) -c $(CXXFLAGS) -o YM2203$(DOTOBJ) YM2203.cpp
 YM2203_Timbre$(DOTOBJ): $(COMMON_HEADERS) YM2203_Timbre.cpp YM2203_Timbre.h
 	$(CXX) -c $(CXXFLAGS) -o YM2203_Timbre$(DOTOBJ) YM2203_Timbre.cpp
+
+fmgon_test$(DOTOBJ): $(COMMON_HEADERS) fmgon_test.cpp soundplayer.h YM2203.h
+	$(CXX) -c $(CXXFLAGS) -o fmgon_test$(DOTOBJ) fmgon_test.cpp
 
 clean:
 	rm -f *.o

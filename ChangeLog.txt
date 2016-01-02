@@ -62,5 +62,7 @@
 「書けるかな？」さんが作ってくれたものです。
 
 2016年1月1日 片山博文MZ
-ファイル「Makefile」を追加。
-ソースの整形。
+ファイル「Makefile.g++」「Makefile.mingw32」「Makefile.mingw64」
+を追加。ソースの整形。
+Visual Studio 2015のプロジェクトファイルを追加。
+ファイル「fmgon_test.cpp」を追加。

@@ -123,10 +123,8 @@ void YM2203::set_volume(int ch, int volume, int adj[4]) {
     static const uint8_t OP_OFFSET[] = {0x00, 0x08, 0x04, 0x0C};
     uint32_t addr, data;
 
-    if ((volume < 0) || (volume > 15)) {
-        assert(0);
-        return;
-    }
+    assert((0 <= volume) && (volume <= 15));
+
     if ((FM_CH1 <= ch) && (ch <= FM_CH3)) {
         if (m_fm_timbres[ch] == NULL) {
             assert(0);

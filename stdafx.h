@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 // C++ headers
 #include <vector>   // for std::vector
 #include <deque>    // for std::deque

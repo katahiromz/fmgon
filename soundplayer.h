@@ -40,13 +40,17 @@ struct VskNote {
     int         m_tone;
     int         m_key;
     bool        m_dot;
-    int         m_length;
+    float       m_length;
     char        m_sign;
     float       m_sec;
     float       m_gate;
+    float       m_volume;   // in 0 to 15
+    int         m_quantity; // in 0 to 8
 
-    VskNote(int tempo, int octave, int tone, char note,
-            bool dot = false, int length = 24, char sign = 0)
+    VskNote(int tempo, int octave, int tone, int note,
+            bool dot = false, float length = 24, char sign = 0,
+            float volume = 8, int quantity = 8,
+            int envelop_type = 1, uint16_t envelop_interval = 255)
     {
         m_tempo = tempo;
         m_octave = octave;
@@ -56,9 +60,11 @@ struct VskNote {
         m_sign = sign;
         m_sec = get_sec(m_tempo, m_length);
         set_key_from_char(note);
+        m_volume = volume;
+        m_quantity = quantity;
     }
 
-    float get_sec(int tempo, int length) const;
+    float get_sec(int tempo, float length) const;
     void set_key_from_char(char note);
 
 private:
@@ -70,25 +76,31 @@ private:
 
 struct VskSoundSetting {
     int                 m_tempo;
-    int                 m_octave;
-    int                 m_length;
-    int                 m_tone;
-    YM2203_Timbre       m_timbre;
-    bool                m_fm;
+    int                 m_octave;   // 
+    float               m_length;   // 24 is the length of a quarter note
+    int                 m_tone;     // see YM2203_Timbre
+    YM2203_Timbre       m_timbre;   // see YM2203_Timbre
+    bool                m_fm;       // whether it is FM or not?
+    float               m_volume;   // in 0 to 15
+    int                 m_quantity; // in 0 to 8
 
-    VskSoundSetting(int tempo = 120, int octave = 4, int length = 24,
-                    int tone = 0) :
+    VskSoundSetting(int tempo = 120, int octave = 4, float length = 24,
+                    int tone = 0, bool fm = false) :
         m_tempo(tempo), m_octave(octave), m_length(length), m_tone(tone),
-        m_fm(true)
+        m_fm(fm)
     {
+        m_volume = 8;
+        m_quantity = 8;
     }
 
     void reset() {
         m_tempo = 120;
         m_octave = 4;
-        m_length = 24;  // NOTE: 24 is the length of a quarter note
+        m_length = 24;
         m_tone = 0;
-        m_fm = true;
+        m_fm = false;
+        m_volume = 8;
+        m_quantity = 8;
     }
 }; // struct VskSoundSetting
 
@@ -117,18 +129,49 @@ struct VskPhrase {
     void add_note(char note, bool dot) {
         add_note(note, dot, m_setting.m_length);
     }
-    void add_note(char note, bool dot, int length) {
+    void add_note(char note, bool dot, float length) {
         add_note(note, dot, length, 0);
     }
-    void add_note(char note, bool dot, int length, char sign) {
-        add_note(m_setting.m_tone, note, dot, length, sign);
+    void add_note(char note, bool dot, float length, char sign) {
+        add_note(note, dot, length, sign, m_setting.m_quantity);
     }
-    void add_note(int tone, char note, bool dot, int length, char sign) {
+    void add_note(char note, bool dot, float length, char sign, int quantity) {
+        add_note(m_setting.m_tone, note, dot, length, sign, quantity);
+    }
+    void add_note(int tone, char note, bool dot, float length, char sign,
+                  int quantity)
+    {
         m_notes.emplace_back(
             m_setting.m_tempo, m_setting.m_octave,
-            tone, note, dot, length, sign
-        );
+            tone, note, dot, length, sign, m_setting.m_volume, quantity);
     }
+    void add_key(int key) {
+        add_key(key, false);
+    }
+    void add_key(int key, bool dot) {
+        add_key(key, dot, m_setting.m_length);
+    }
+    void add_key(int key, bool dot, float length) {
+        add_key(key, dot, length, 0);
+    }
+    void add_key(int key, bool dot, float length, char sign) {
+        add_key(key, dot, length, sign, m_setting.m_quantity);
+    }
+    void add_key(int key, bool dot, float length, char sign, int quantity) {
+        add_key(m_setting.m_tone, key, dot, length, sign, quantity);
+    }
+    void add_key(int tone, int key, bool dot, float length, char sign,
+                 int quantity)
+    {
+        if (key == 96) {
+            key = 0;
+        }
+        VskNote note(m_setting.m_tempo, 0,
+            tone, 0, dot, length, sign, m_setting.m_volume, quantity);
+        note.m_key = key;
+        m_notes.push_back(note);
+    }
+
     void calc_total();
     void realize(VskSoundPlayer *player);
     void destroy();
