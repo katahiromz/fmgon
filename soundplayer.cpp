@@ -195,21 +195,15 @@ void VskNote::set_key_from_char(char ch) {
         case '+': case '#':
             if (m_key == KEY_B) {
                 m_key = KEY_C;
-                if (m_octave < 7) {
-                    ++m_octave;
-                }
             } else {
-                --m_key;
+                ++m_key;
             }
             break;
         case '-':
             if (m_key == KEY_C) {
-                m_key = KEY_C;
-                if (m_octave > 0) {
-                    --m_octave;
-                }
+                m_key = KEY_B;
             } else {
-                ++m_key;
+                --m_key;
             }
             break;
         default:
