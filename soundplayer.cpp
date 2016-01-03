@@ -336,16 +336,19 @@ void VskPhrase::realize(VskSoundPlayer *player) {
             }
 
             // render sound
-            auto sec = note.m_sec;
+            auto sec = note.m_sec * note.m_quantity / 8.0f;
             auto nsamples = int(SAMPLERATE * sec);
             ym.mix(&data[isample * 2], nsamples);
             ym.count(uint32_t(sec * 1000 * 1000));
             isample += nsamples;
 
             // do key off
+            sec = note.m_sec * (8.0f - note.m_quantity) / 8.0f;
+            nsamples = int(SAMPLERATE * sec);
             ym.note_off(ch);
-            ym.mix(NULL, 0);
-            ym.count(0);
+            ym.mix(&data[isample * 2], nsamples);
+            ym.count(uint32_t(sec * 1000 * 1000));
+            isample += nsamples;
         }
     }
 
