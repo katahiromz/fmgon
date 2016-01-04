@@ -84,7 +84,7 @@ struct VskSoundSetting {
     float               m_volume;   // in 0 to 15
     int                 m_quantity; // in 0 to 8
 
-    VskSoundSetting(int tempo = 120, int octave = 4, float length = 24,
+    VskSoundSetting(int tempo = 120, int octave = 4 - 1, float length = 24,
                     int tone = 0, bool fm = false) :
         m_tempo(tempo), m_octave(octave), m_length(length), m_tone(tone),
         m_fm(fm)
@@ -95,7 +95,7 @@ struct VskSoundSetting {
 
     void reset() {
         m_tempo = 120;
-        m_octave = 4;
+        m_octave = 4 - 1;
         m_length = 24;
         m_tone = 0;
         m_fm = false;
