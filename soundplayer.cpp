@@ -37,10 +37,10 @@ public:
         }
         //m_count = 0;
         m_phase = 0;
-        m_adj_p_max = p_timbre->pmd * (float)p_timbre->pms / 2.0f; // TBD
+        m_adj_p_max = p_timbre->pmd / 128.0f * (1 << p_timbre->pms); // TBD
         for (i = 0; i < 4; ++i) {
             m_adj_v_max[i] =
-                p_timbre->amd * (float)p_timbre->ams[i] / 2; // TBD
+                p_timbre->amd / 128.0f * (1 << p_timbre->ams[i]); // TBD
         }
         init_for_phase(true);
     }
