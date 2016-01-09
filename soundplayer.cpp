@@ -227,6 +227,31 @@ void VskPhrase::destroy() {
     }
 } // VskPhrase::destroy
 
+void VskPhrase::rescan_notes() {
+    std::vector<VskNote> new_notes;
+    for (size_t i = 0; i < m_notes.size(); ++i) {
+        if (m_notes[i].m_and) {
+            size_t k = 0;
+            float length = 0, sec = 0;
+            do {
+                length += m_notes[i + k].m_length;
+                sec += m_notes[i + k].m_sec;
+                ++k;
+            } while (m_notes[i + k].m_and);
+            length += m_notes[i + k].m_length;
+            sec += m_notes[i + k].m_sec;
+            m_notes[i].m_length = length;
+            m_notes[i].m_sec = sec;
+            new_notes.push_back(m_notes[i]);
+            i += k;
+        } else {
+            new_notes.push_back(m_notes[i]);
+        }
+    }
+
+    m_notes = std::move(new_notes);
+} // VskPhrase::rescan_notes
+
 void VskPhrase::calc_total() {
     float gate = 0;
     for (auto& note : m_notes) {
@@ -239,6 +264,7 @@ void VskPhrase::calc_total() {
 void VskPhrase::realize(VskSoundPlayer *player) {
     destroy();
     calc_total();
+    rescan_notes();
 
     // initialize YM2203
     YM2203& ym = player->m_ym;

@@ -46,11 +46,13 @@ struct VskNote {
     float       m_gate;
     float       m_volume;   // in 0 to 15
     int         m_quantity; // in 0 to 8
+    bool        m_and;
 
     VskNote(int tempo, int octave, int tone, int note,
             bool dot = false, float length = 24, char sign = 0,
             float volume = 8, int quantity = 8,
-            int envelop_type = 1, uint16_t envelop_interval = 255)
+            int envelop_type = 1, uint16_t envelop_interval = 255,
+            bool and_ = false)
     {
         m_tempo = tempo;
         m_octave = octave;
@@ -62,6 +64,7 @@ struct VskNote {
         set_key_from_char(note);
         m_volume = volume;
         m_quantity = quantity;
+        m_and = and_;
     }
 
     float get_sec(int tempo, float length) const;
@@ -145,6 +148,14 @@ struct VskPhrase {
             m_setting.m_tempo, m_setting.m_octave,
             tone, note, dot, length, sign, m_setting.m_volume, quantity);
     }
+    void add_note(int tone, char note, bool dot, float length, char sign,
+                  int quantity, bool and_)
+    {
+        m_notes.emplace_back(
+            m_setting.m_tempo, m_setting.m_octave,
+            tone, note, dot, length, sign, m_setting.m_volume,
+            quantity, and_);
+    }
     void add_key(int key) {
         add_key(key, false);
     }
@@ -172,6 +183,7 @@ struct VskPhrase {
         m_notes.push_back(note);
     }
 
+    void rescan_notes();
     void calc_total();
     void realize(VskSoundPlayer *player);
     void destroy();
