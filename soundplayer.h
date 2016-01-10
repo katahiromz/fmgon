@@ -78,8 +78,8 @@ private:
 // VskSoundSetting
 
 struct VskSoundSetting {
-    int                 m_tempo;
-    int                 m_octave;   // 
+    int                 m_tempo;    // tempo
+    int                 m_octave;   // octave
     float               m_length;   // 24 is the length of a quarter note
     int                 m_tone;     // see YM2203_Timbre
     YM2203_Timbre       m_timbre;   // see YM2203_Timbre
@@ -197,12 +197,15 @@ typedef std::vector<shared_ptr<VskPhrase>>  VskScoreBlock;
 //////////////////////////////////////////////////////////////////////////////
 
 struct VskSoundPlayer {
-    bool                                m_playing_music;
-    PE_event                            m_stopping_event;
-    std::deque<VskScoreBlock>           m_melody_line;
-    std::mutex                          m_lock;
-    std::vector<shared_ptr<VskNote>>    m_notes;
-    YM2203                              m_ym;
+    bool                                        m_playing_music;
+    PE_event                                    m_stopping_event;
+    std::deque<VskScoreBlock>                   m_melody_line;
+    std::mutex                                  m_play_lock;
+    std::vector<shared_ptr<VskNote>>            m_notes;
+    YM2203                                      m_ym;
+    std::mutex                                  m_play_async_lock;
+    std::unordered_map<int, VskScoreBlock>      m_async_sound_map;
+    static int                                  m_next_async_sound_id;
 
     VskSoundPlayer() : m_playing_music(false),
                        m_stopping_event(false, false) { init_beep(); }
@@ -212,6 +215,7 @@ struct VskSoundPlayer {
     }
 
     void play(VskScoreBlock& block);
+    void play_async(VskScoreBlock& block);
     bool wait_for_stop(uint32_t milliseconds = -1);
     bool play_and_wait(VskScoreBlock& block, uint32_t milliseconds = -1);
     void stop();

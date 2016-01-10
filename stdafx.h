@@ -1,11 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 // C++ headers
-#include <vector>   // for std::vector
-#include <deque>    // for std::deque
-#include <thread>   // for std::thread
-#include <mutex>    // for std::mutex
-#include <memory>   // for smart pointers
+#include <vector>           // for std::vector
+#include <deque>            // for std::deque
+#include <unordered_map>    // for std::unordered_map
+#include <thread>           // for std::thread
+#include <mutex>            // for std::mutex
+#include <memory>           // for smart pointers
 using std::shared_ptr;
 using std::make_shared;
 using std::unique_ptr;

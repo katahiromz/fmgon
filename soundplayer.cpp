@@ -25,7 +25,10 @@ public:
     float   m_adj_v[4]; // for volume
 
 public:
-    VskLFOCtrl() { }
+    VskLFOCtrl() {
+        m_adj_p = 0;
+        memset(m_adj_v_diff, 0, sizeof(m_adj_v_diff));
+    }
 
     void init_for_timbre(YM2203_Timbre *p_timbre) {
         int i;
@@ -394,6 +397,8 @@ void VskPhrase::realize(VskSoundPlayer *player) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+/*static*/ int VskSoundPlayer::m_next_async_sound_id = 0;
+
 bool VskSoundPlayer::wait_for_stop(uint32_t milliseconds) {
     return m_stopping_event.wait_for_event(milliseconds);
 }
@@ -404,17 +409,15 @@ bool VskSoundPlayer::play_and_wait(VskScoreBlock& block, uint32_t milliseconds) 
 }
 
 void VskSoundPlayer::play(VskScoreBlock& block) {
-    int i = 0;
     for (auto& phrase : block) {
         if (phrase) {
             phrase->realize(this);
         }
-        ++i;
     }
 
-    m_lock.lock();
+    m_play_lock.lock();
     m_melody_line.push_back(block);
-    m_lock.unlock();
+    m_play_lock.unlock();
 
     if (m_playing_music) {
         return;
@@ -429,15 +432,15 @@ void VskSoundPlayer::play(VskScoreBlock& block) {
             VskScoreBlock phrases;
             for (;;) {
                 // get the next block
-                m_lock.lock();
+                m_play_lock.lock();
                 if (m_melody_line.empty()) {
-                    m_lock.unlock();
+                    m_play_lock.unlock();
                     m_stopping_event.pulse();
                     break;
                 }
                 phrases = m_melody_line.front();
                 m_melody_line.pop_front();
-                m_lock.unlock();
+                m_play_lock.unlock();
 
                 // get the goal
                 float goal = 0;
@@ -471,7 +474,61 @@ void VskSoundPlayer::play(VskScoreBlock& block) {
 void VskSoundPlayer::stop() {
     m_playing_music = false;
     m_stopping_event.pulse();
-}
+
+    m_play_lock.lock();
+    m_melody_line.clear();
+    m_play_lock.unlock();
+
+    m_play_async_lock.lock();
+    m_async_sound_map.clear();
+    m_play_async_lock.unlock();
+} // VskSoundPlayer::stop
+
+void VskSoundPlayer::play_async(VskScoreBlock& block) {
+    for (auto& phrase : block) {
+        if (phrase) {
+            phrase->realize(this);
+        }
+    }
+
+    std::thread(
+        [this, block](int dummy) {
+            int id;
+
+            m_play_async_lock.lock();
+            id = m_next_async_sound_id++;
+            m_async_sound_map[id] = block;
+            m_play_async_lock.unlock();
+
+            // get the goal
+            float goal = 0;
+            for (auto& phrase : block) {
+                if (phrase) {
+                    if (goal < phrase->m_goal) {
+                        goal = phrase->m_goal;
+                    }
+                }
+            }
+
+            // play phrases
+            for (auto& phrase : block) {
+                if (phrase) {
+                    alSourcePlay(phrase->m_source);
+                }
+            }
+
+            auto msec = uint32_t(goal * 1000.0);
+            if (m_stopping_event.wait_for_event(msec)) {
+                alutSleep(1.0);
+            }
+
+            m_play_async_lock.lock();
+            m_async_sound_map.erase(id);
+            m_play_async_lock.unlock();
+        },
+        0
+    ).detach();
+} // VskSoundPlayer::play_async
 
 //////////////////////////////////////////////////////////////////////////////
 // beep
