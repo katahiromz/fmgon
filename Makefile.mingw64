@@ -25,7 +25,7 @@ OBJS = \
 EXTRA_OBJ = fmgon_test$(DOTOBJ)
 
 CXX = g++ -std=c++11
-CXXFLAGS = -mconsole -DNDEBUG -Wall -pedantic
+CXXFLAGS = -DNDEBUG -Wall -pedantic -O3
 
 #LIBS=-lalut -lopenal32
 LIBS=-lalut -lopenal32.dll -static
@@ -35,7 +35,7 @@ exe: $(EXEFILE)
 lib: $(LIBFILE)
 
 $(EXEFILE): $(OBJS) $(EXTRA_OBJ)
-	$(CXX) $(CXXFLAGS) -o $(EXEFILE) $(OBJS) $(EXTRA_OBJ) $(LIBS)
+	$(CXX) -mconsole $(CXXFLAGS) -o $(EXEFILE) $(OBJS) $(EXTRA_OBJ) $(LIBS)
 $(LIBFILE): $(OBJS)
 	ar r $(LIBFILE) $(OBJS)
 	ranlib $(LIBFILE)

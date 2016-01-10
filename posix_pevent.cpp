@@ -22,6 +22,8 @@
 #include <sys/time.h>   /* for struct timeval, timespec */
 #include <pthread.h>    /* for POSIX threads */
 
+#include "pevent.h"
+
 /*--------------------------------------------------------------------------*/
 /* internal type */
 

@@ -815,6 +815,9 @@ ISample Channel4::Calc() {
         r += op[3].Calc(0);
         r += op[0].CalcFB(fb);
         break;
+    default:
+        r = 0;
+        break;
     }
     return r;
 }
@@ -872,6 +875,9 @@ ISample Channel4::CalcL() {
         r += op[1].CalcL(0);
         r += op[3].CalcL(0);
         r += op[0].CalcFBL(fb);
+        break;
+    default:
+        r = 0;
         break;
     }
     return r;
